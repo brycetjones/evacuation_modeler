@@ -6,6 +6,7 @@ from constants import C
 import logging 
 from src.profiles import pick_profile
 from src.agent import EvacueeAgent
+import random 
 
 class EvacuationModel(Model):
     """Model for simulating evacuation of multiple agents to a chosen shelter."""
@@ -139,3 +140,11 @@ class EvacuationModel(Model):
             'total_rest_areas': total_rest,
             'avg_accessibility': avg_access
         }
+    
+    def step(self):
+        random.shuffle(self.evacuees)
+        for agent in self.evacuees:
+            agent.step()
+        self.time += 1
+        if all(agent.arrived for agent in self.evacuees):
+            self.running = False

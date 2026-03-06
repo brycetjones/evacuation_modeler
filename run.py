@@ -38,12 +38,6 @@ def main():
         # Run model
         model = EvacuationModel(num_agents, walking_graph, shelters, start_node, shelter_options)
 
-        print(f"Agents created: {len(model.evacuees)}")
-        print(f"Model running: {model.running}")
-        if model.evacuees:
-            a = model.evacuees[0]
-            print(f"Sample agent speed: {a.speed}, water_reserve: {a.water_reserve}, path length: {len(a.path)}")
-            
         # Show progress bar
         with tqdm(total=model.estimated_steps, desc="Simulating evacuation", unit="steps", bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
             while model.running:
@@ -68,11 +62,11 @@ def main():
         print(f"\n{Fore.GREEN}Simulation completed.{Style.RESET_ALL}")
         print(f"Average arrival time: {df['arrival_time'].mean():.2f} minutes")
         print(f"Total water needed: {df['water_needed'].sum():.2f} liters")
-        print(f"Average distance traveled: {df['distance'].mean():.2f} meters")
+        print(f"Average distance traveled: {df['total_distance'].mean():.2f} meters")
         
         # Group stats by profile, show results
-        print(f"\n{Fore.GREEN}Statistics by Profile:{Style.RESET_ALL}")
-        stats = df.groupby('profile').agg({
+        print(f"\n{Fore.GREEN}Statistics by demographic:{Style.RESET_ALL}")
+        stats = df.groupby('demographic').agg({
             'arrival_time': ['mean', 'count'],
             'distance': 'mean',
             'water_needed': ['mean', 'sum'],
@@ -85,7 +79,7 @@ def main():
         
         # Show shelter results
         print(f"\n{Fore.GREEN}Shelter Distribution by Profile:{Style.RESET_ALL}")
-        shelter_dist = pd.crosstab(df['profile'], df['destination_node'], normalize='index').round(3) * 100
+        shelter_dist = pd.crosstab(df['demographic'], df['destination_node'], normalize='index').round(3) * 100
         shelter_dist.columns = [f"Shelter {shelter_nums.get(col, 'Unknown')}" for col in shelter_dist.columns]
         print(shelter_dist)
         
