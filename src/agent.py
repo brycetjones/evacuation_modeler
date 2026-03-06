@@ -22,6 +22,7 @@ class EvacueeAgent(Agent):
         self.path = path
         self.route_attrs = route_attrs
         self.water_needed = 0.0
+        self.vulnerability = profile.vulnerability
 
         # Positional data
         if len(self.path) > 1:
