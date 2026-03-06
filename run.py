@@ -37,8 +37,13 @@ def main():
     try:
         # Run model
         model = EvacuationModel(num_agents, walking_graph, shelters, start_node, shelter_options)
-        model.create_agents()
 
+        print(f"Agents created: {len(model.evacuees)}")
+        print(f"Model running: {model.running}")
+        if model.evacuees:
+            a = model.evacuees[0]
+            print(f"Sample agent speed: {a.speed}, water_reserve: {a.water_reserve}, path length: {len(a.path)}")
+            
         # Show progress bar
         with tqdm(total=model.estimated_steps, desc="Simulating evacuation", unit="steps", bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
             while model.running:

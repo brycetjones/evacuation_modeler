@@ -29,7 +29,6 @@ class EvacuationModel(Model):
         avg_speed = C.BASE_WALKING_SPEED_MPS * np.mean(list(C.MOBILITY_FACTORS.values())) / np.mean(list(C.VULNERABILITY_FACTORS.values()))
         self.estimated_steps = int((avg_distance / avg_speed / 60) * num_agents * 1.5)  # Conservative estimate
 
-    def create_agents(self):
         """ Builds agents """
         for _ in range(self.num_agents):
             profile = pick_profile()
