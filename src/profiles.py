@@ -13,7 +13,7 @@ class Preference():
 
 class Elderly():
     def __init__(self):
-        self.demographic = "elderly"
+        self.demographic = "Elderly"
         self.age = random.randint(65, 80)
         self.vulnerability = np.random.choice(['Medium', 'High'], p=[0.5, 0.5])
         self.medical_needs = random.random() < 0.7
@@ -32,7 +32,7 @@ class Elderly():
 
 class Family():
     def __init__(self):
-        self.demographic = "family"
+        self.demographic = "Family"
         self.age = random.randint(30, 50)
         self.vulnerability = np.random.choice(['Low', 'Medium'], p=[0.6, 0.4])
         self.medical_needs = random.random() < 0.2
@@ -51,7 +51,7 @@ class Family():
 
 class YoungAdult():
     def __init__(self):
-        self.demographic = "young adult"
+        self.demographic = "Young Adult"
         self.age = random.randint(18, 35)
         self.vulnerability = np.random.choice(['Low', 'Medium'], p=[0.8, 0.2])
         self.medical_needs = random.random() < 0.1
@@ -70,7 +70,7 @@ class YoungAdult():
 
 class MobilityImpaired():
     def __init__(self):
-        self.demographic = "mobility impaired"
+        self.demographic = "Mobility Impaired"
         self.age = random.randint(40, 70)
         self.vulnerability = np.random.choice(['Medium', 'High'], p=[0.5, 0.5])
         self.medical_needs = random.random() < 0.6

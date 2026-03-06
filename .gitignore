@@ -1,3 +1,4 @@
 cache/
 /key.txt
 __pycache__/
+outputs/

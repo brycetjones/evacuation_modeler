@@ -8,9 +8,12 @@ class EvacueeAgent(Agent):
         self.start_node = start_node
         self.current_node = start_node
         self.destination_node = destination_node
-        self.profile = profile
         self.water_reserve = profile.water_reserve
         self.demographic = profile.demographic
+        self.age = profile.age
+        self.family_status = profile.family_status
+        self.medical_needs = profile.medical_needs
+        self.mobility_level = profile.mobility_level
         self.speed = (C.BASE_WALKING_SPEED_MPS / C.VULNERABILITY_FACTORS[profile.vulnerability]) * C.MOBILITY_FACTORS[profile.mobility_level]
         self.arrival_time = None
         self.path = path

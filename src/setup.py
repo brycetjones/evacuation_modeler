@@ -147,4 +147,4 @@ def setup():
             return
 
         # Return stuff
-        return walking_graph, shelters, start_coords, start_address
+        return walking_graph, shelters, start_coords, start_address, polygon

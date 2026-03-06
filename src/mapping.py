@@ -3,6 +3,8 @@ from folium import FeatureGroup, LayerControl
 import osmnx as ox
 from dataclasses import dataclass
 from shapely import LineString
+from constants import C 
+from colorama import Fore, Style
 
 @dataclass
 class MapData():
@@ -16,10 +18,10 @@ class MapData():
     model: any
     start_address: any
 
-def create_map(data: MapData):
-    nodes = ox.graph_to_gdfs(data.walking_graph, nodes=True)[0]
-    grouped = data.df.groupby(['profile', 'destination_node'])
-    unique_dests = sorted(data.df['destination_node'].unique())
+def create_map(map_data: MapData):
+    nodes = ox.graph_to_gdfs(map_data.walking_graph, nodes=True)[0]
+    grouped = map_data.df.groupby(['demographic', 'destination_node'])
+    unique_dests = sorted(map_data.df['destination_node'].unique())
     
     profile_colors = {
         'Elderly': '#1f77b4',  # Blue
@@ -28,11 +30,11 @@ def create_map(data: MapData):
         'Mobility Impaired': '#d62728'  # Red
     }
     
-    folium_map = folium.Map(location=[nodes.loc[data.start_node]['y'], nodes.loc[data.start_node]['x']], zoom_start=15, tiles='openstreetmap')
+    folium_map = folium.Map(location=[nodes.loc[map_data.start_node]['y'], nodes.loc[map_data.start_node]['x']], zoom_start=15, tiles='openstreetmap')
     
     # Add base graph edges
     base_layer = FeatureGroup(name="Base Map", show=True)
-    for u, v, key, data in data.walking_graph.edges(keys=True, data=True):
+    for u, v, key, data in map_data.walking_graph.edges(keys=True, data=True):
         if 'geometry' in data:
             line = data['geometry']
         else:
@@ -41,10 +43,10 @@ def create_map(data: MapData):
         folium.PolyLine(locations, color='gray', weight=1, opacity=0.5).add_to(base_layer)
     base_layer.add_to(folium_map)
     
-    folium.GeoJson(data.boundary, style_function=lambda x: {'color': 'black', 'weight': 2, 'fillOpacity': 0}).add_to(base_layer)
+    folium.GeoJson(map_data.boundary, style_function=lambda x: {'color': 'black', 'weight': 2, 'fillOpacity': 0}).add_to(base_layer)
     
     # Add profile-specific layers
-    profile_layers = {profile: FeatureGroup(name=f"{profile} Paths", show=False) for profile in AGENT_PROFILES}
+    profile_layers = {profile: FeatureGroup(name=f"{profile} Paths", show=False) for profile in C.AGENT_DEMOGRAPHICS}
     for (profile, dest), group in grouped:
         path = group['path'].iloc[0]
         if len(path) < 2:
@@ -52,7 +54,7 @@ def create_map(data: MapData):
         path_coords = [[nodes.loc[n]['y'], nodes.loc[n]['x']] for n in path if n in nodes.index]
         if path_coords:
             color = profile_colors[profile]
-            distance = group['distance'].iloc[0]
+            distance = group['total_distance'].iloc[0]
             total_agents = len(group)
             avg_arrival = group['arrival_time'].mean()
             total_water = group['water_needed'].sum()
@@ -66,7 +68,7 @@ def create_map(data: MapData):
             stats_table_html = vuln_stats.to_html(border=1)
             route_attrs = group['route_attrs'].iloc[0]
             tooltip_html = f"""
-            <b>Path to Shelter {data.shelter_nums.get(dest, 'Unknown')} (Profile: {profile})</b><br>
+            <b>Path to Shelter {map_data.shelter_nums.get(dest, 'Unknown')} (Profile: {profile})</b><br>
             Distance: {distance:.2f} meters<br>
             Total Agents: {total_agents}<br>
             Avg Arrival Time: {avg_arrival:.2f} min<br>
@@ -83,20 +85,20 @@ def create_map(data: MapData):
     for layer in profile_layers.values():
         layer.add_to(folium_map)
     
-    folium.Marker(location=[nodes.loc[data.start_node]['y'], nodes.loc[data.start_node]['x']],
+    folium.Marker(location=[nodes.loc[map_data.start_node]['y'], nodes.loc[map_data.start_node]['x']],
                     popup='Start Point', icon=folium.Icon(color='red', icon='info-sign')).add_to(base_layer)
     
     for node in unique_dests:
         if node in nodes.index:
             lat = nodes.loc[node]['y']
             lon = nodes.loc[node]['x']
-            shelter_idx = data.shelter_mapping[node]
-            capacity = data.shelters.iloc[shelter_idx]['capacity']
-            occupancy = data.model.shelter_occupancy.get(node, 0)
-            popup = f"Shelter {data.shelter_nums.get(node, 'Unknown')}<br>Occupancy: {occupancy}/{capacity}"
+            shelter_idx = map_data.shelter_mapping[node]
+            capacity = map_data.shelters.iloc[shelter_idx]['capacity']
+            occupancy = map_data.model.shelter_occupancy.get(node, 0)
+            popup = f"Shelter {map_data.shelter_nums.get(node, 'Unknown')}<br>Occupancy: {occupancy}/{capacity}"
             folium.Marker(location=[lat, lon], popup=popup,
                             icon=folium.Icon(color='blue', icon='info-sign')).add_to(base_layer)
     
     LayerControl().add_to(folium_map)
-    folium_map.save('evac_paths_' + data.start_address + '.html')
-    print(f"{Fore.GREEN}Map saved to 'evac_paths_{start_address}.html' with profile filters.{Style.RESET_ALL}")
+    folium_map.save('evac_paths_' + map_data.start_address + '.html')
+    print(f"{Fore.GREEN}Map saved to 'evac_paths_{map_data.start_address}.html' with profile filters.{Style.RESET_ALL}")

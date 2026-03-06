@@ -17,7 +17,7 @@ def main():
     print(f"{Fore.CYAN}=== Nihonbashi Evacuation Route Planner v11 (ABM) ==={Style.RESET_ALL}")
     
     # Load files and stuff
-    walking_graph, shelters, start_coords, start_address = setup()
+    walking_graph, shelters, start_coords, start_address, boundary = setup()
 
     # Find shortest path to shelters
     shelter_options, shelter_nums, start_node, shelter_mapping = find_path(
@@ -68,7 +68,7 @@ def main():
         print(f"\n{Fore.GREEN}Statistics by demographic:{Style.RESET_ALL}")
         stats = df.groupby('demographic').agg({
             'arrival_time': ['mean', 'count'],
-            'distance': 'mean',
+            'total_distance': 'mean',
             'water_needed': ['mean', 'sum'],
             'age': 'mean',
             'medical_needs': 'mean',
@@ -92,7 +92,7 @@ def main():
             print(f"Shelter {shelter_nums.get(node, 'Unknown')}: {occupancy}/{capacity} ({occupancy/capacity*100:.1f}%)")
         
         # Save evac data
-        df.to_csv('evacuation_data.csv', index=False)
+        df.to_csv('outputs/evacuation_data.csv', index=False)
         print(f"\n{Fore.GREEN}Data saved to 'evacuation_data.csv'.{Style.RESET_ALL}")
 
         # Create map data object, show map
@@ -100,8 +100,9 @@ def main():
             walking_graph,
             df,
             start_node,
-            None,
+            boundary,
             shelter_nums,
+            shelter_mapping,
             shelters, 
             model, 
             start_address
