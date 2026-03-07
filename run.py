@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 from colorama import init, Fore, Style
 from tqdm import tqdm
+from os import makedirs
 from src.setup import setup
 from src.path_finding import find_path
 from src.model import EvacuationModel
@@ -12,10 +13,12 @@ init()
 
 def main():
     """Main function to run the ABM evacuation route planner."""
-
     # Announce to console 
     print(f"{Fore.CYAN}=== Nihonbashi Evacuation Route Planner v11 (ABM) ==={Style.RESET_ALL}")
     
+    # Make outputs folder
+    makedirs("outputs", exist_ok=True)
+
     # Load files and stuff
     walking_graph, shelters, start_coords, start_address, boundary = setup()
 

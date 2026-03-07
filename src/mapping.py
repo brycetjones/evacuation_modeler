@@ -100,5 +100,5 @@ def create_map(map_data: MapData):
                             icon=folium.Icon(color='blue', icon='info-sign')).add_to(base_layer)
     
     LayerControl().add_to(folium_map)
-    folium_map.save('evac_paths_' + map_data.start_address + '.html')
+    folium_map.save('outputs/'+'evac_paths_' + map_data.start_address + '.html')
     print(f"{Fore.GREEN}Map saved to 'evac_paths_{map_data.start_address}.html' with profile filters.{Style.RESET_ALL}")

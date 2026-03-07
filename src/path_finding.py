@@ -3,7 +3,7 @@ import networkx as nx
 from colorama import Fore, Style
 
 def find_path(walking_graph, start_coords, shelters):
-    start_lon, start_lat = start_coords
+    start_lat, start_lon = start_coords
     try:
         start_node = ox.distance.nearest_nodes(walking_graph, start_lon, start_lat)
     except Exception as e:

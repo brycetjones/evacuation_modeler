@@ -89,8 +89,8 @@ def load_evacuation_shelters():
 def geocode_address(address, api_key):
     """Geocode an address using Google Maps API with Nominatim fallback."""
     try:
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&region=jp&key={api_key}"
-        response = requests.get(url, timeout=10)
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        response = requests.get(url, params={"address": address, "region": "jp", "key": api_key}, timeout=10)
         response.raise_for_status()
         data = response.json()
         if data['status'] == 'OK':
@@ -103,9 +103,9 @@ def geocode_address(address, api_key):
         logging.error(f"Google Maps API request failed: {e}")
 
     try:
-        url = f"https://nominatim.openstreetmap.org/search?q={address}&format=json&limit=1"
+        url = "https://nominatim.openstreetmap.org/search"
         headers = {'User-Agent': 'NihonbashiRoutePlanner/1.0'}
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, params={"q": address, "format": "json", "limit": 1, "countrycodes":"jp"}, timeout=10)
         response.raise_for_status()
         data = response.json()
         if data:
