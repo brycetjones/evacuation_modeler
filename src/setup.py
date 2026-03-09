@@ -2,7 +2,7 @@ import os
 import logging
 import geopandas as gpd
 from shapely.ops import polygonize
-from shapely.geometry import Point, LineString, Polygon
+from shapely.geometry import Point, MultiPoint
 import osmnx as ox
 import random 
 import pandas as pd 
@@ -33,19 +33,26 @@ def load_bounds(path):
         if geom.geom_type == 'Polygon':
             polygon = geom
         
-        # Polygonize linestrings 
-        elif geom.geom_type in ['LineString', 'MultiLineString']:
-            polygon = polygonize(geom)
-            if isinstance(polygon, Polygon):
-                pass
+        # Create boundary from road linestrings
+        elif geom.geom_type in ['LineString', 'MultiLineString',
+                             'MultiPoint', 'GeometryCollection']:
+            # Extract all vertices from the road network and build a hull
+            if hasattr(geom, 'geoms'):
+                coords = [pt for g in geom.geoms for pt in g.coords]
             else:
-                polygon = next(iter(polygon))
+                coords = list(geom.coords)
+            
+            hull = MultiPoint(coords).convex_hull
+            polygon = hull
         else:
             raise ValueError("Unsupported geometry type")
+        
+        # Check to make sure pol
         if not polygon.is_valid:
             polygon = polygon.buffer(0)
-        boundary.at[boundary.index[0], 'geometry'] = polygon
-        return boundary
+        result = gpd.GeoDataFrame(geometry=[polygon], crs="EPSG:4326")
+        return result
+    
     except Exception as e:
         logging.error(f"Failed to load boundary shapefile: {e}")
         raise
