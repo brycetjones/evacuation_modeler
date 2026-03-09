@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.space import NetworkGrid
 import numpy as np
 import networkx as nx
-from constants import C 
+from settings import C 
 import logging 
 from src.profiles import pick_profile
 from src.agent import EvacueeAgent

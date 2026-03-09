@@ -3,7 +3,7 @@ from folium import FeatureGroup, LayerControl
 import osmnx as ox
 from dataclasses import dataclass
 from shapely import LineString
-from constants import C 
+from settings import C 
 from colorama import Fore, Style
 
 @dataclass

@@ -1,4 +1,4 @@
-from constants import C 
+from settings import C 
 from mesa import Agent 
 
 class EvacueeAgent(Agent):

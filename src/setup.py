@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import requests 
 from colorama import Fore, Style
-from constants import C 
+from settings import C 
 
 def read_key():
     with open(C.API_KEY_PATH, "r") as f:
@@ -19,8 +19,8 @@ def read_key():
 def load_bounds(path):
     """Load Nihonbashi boundary shapefile and convert to polygon in EPSG:4326."""
     if not os.path.exists(path):
-        raise FileNotFoundError("Boundary shapefile not found.")
-    logging.info("Loading boundary shapefile...")
+        raise FileNotFoundError("Boundary file not found.")
+    logging.info("Loading boundary file...")
     try:
         boundary = gpd.read_file(path)
         # Set CRS
@@ -28,10 +28,12 @@ def load_bounds(path):
             boundary.set_crs(epsg=2451, inplace=True)
         boundary = boundary.to_crs(epsg=4326)
         
-        # Make polygon
+        # Make polygon boundary
         geom = boundary.union_all()
         if geom.geom_type == 'Polygon':
             polygon = geom
+        
+        # Polygonize linestrings 
         elif geom.geom_type in ['LineString', 'MultiLineString']:
             polygon = polygonize(geom)
             if isinstance(polygon, Polygon):
@@ -70,7 +72,7 @@ def load_walking_graph(polygon, key):
 def load_evacuation_shelters():
     """Load evacuation shelters from provided CSV data."""
     if not os.path.exists(C.SHELTERS_PATH):
-        raise FileNotFoundError("evac_shelters.csv not found.")
+        raise FileNotFoundError("Evacuation shelters not found.")
     logging.info("Loading evacuation shelters from CSV...")
     try:
         shelters_data = pd.read_csv(C.SHELTERS_PATH)
